@@ -1,0 +1,12 @@
+
+* dont fear the voodoo, automate everything (but KISS)
+
+* peps connected implcitely through events
+
+* tag everything
+
+* weight images
+
+MEH IDEAs
+* tags can be positive, negative, or neutral
+  - counts as upvote/downvote

@@ -1,0 +1,19 @@
+<% USE Dumper %>  
+
+<div id="page">
+      <div id="content">
+        <div id="header">
+          <h1>explore!</h1>
+          <h2><% name %>'s <% location %> </h2>
+        </div>
+
+        <div id=pictures>
+         <% FOREACH p IN pics  %>
+         <div id="<%p.Name %>"> 
+            <% p.Name %>
+         </div>
+         <% END %>
+        </div>
+
+      </div>
+</div>
