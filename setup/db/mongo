@@ -1,7 +1,0 @@
-db.Peps.insert( {Name: 'Will', Byear: 1986});
-db.Peps.insert( {Name: 'Emily', Byear: 1988} )
-db.Tags.insert( {Name: 'fun', Type: 'attr'}, {Name: 'abandoned', Type: 'attr'} )
-db.locs.insert( {Name: 'Warlock Query'} )
-db.Locs.insert( {Name: 'Warlock Query'} )
-db.Events.insert( {Name: 'Journey to Warlock Query'} )
-
