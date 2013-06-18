@@ -1,0 +1,22 @@
+<div id="page">
+      <div id="content">
+	<% FOREACH pic IN pics %>
+        <div>
+	<form method="POST" action="./<%pic.Hash%>">
+          <h1>Edit</h1>
+	  <div style="display:inline-block">
+	  <img  src="/images/testpics/<% pic.File %>" class="block" \> <br>
+	  </div>
+	  <div style="display:inline-block">
+	  <input type="input" name="Event" value="<%pic.Event%>"         /><br />
+	  <input type="input" name="Latitude" value="<%pic.Latitude%>"  /><br />
+	  <input type="input" name="Longitude" value="<%pic.Longitude%>"/><br />
+	  <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/><br />
+	  <input type="submit" name="submit" value="submit"         /><br />
+	  </div>
+        </div>
+	</form>
+	<% END %>
+
+      </div>
+</div>

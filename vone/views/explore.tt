@@ -7,13 +7,36 @@
           <h2><% name %>'s <% location %> </h2>
         </div>
 
-        <div id=pictures>
-         <% FOREACH p IN pics  %>
+        <div id=peps>
+         <% FOREACH p IN peps  %>
          <div id="<%p.Name %>"> 
             <% p.Name %>
          </div>
          <% END %>
         </div>
+
+
+
+
+        <div id=pictures>
+         <% FOREACH p IN pics  %>
+            <a href="/image/<% p.Hash %>" > <img class=block src="images/testpics/<% p.File %>"></a>
+         <% END %>
+        </div>
+
+
+
+
+
+        <div id=events>
+         <% FOREACH e IN events %>
+         <div id="<%e.Name %>"> 
+            <% e.Name %>
+         </div>
+         <% END %>
+        </div>
+
+
 
       </div>
 </div>
