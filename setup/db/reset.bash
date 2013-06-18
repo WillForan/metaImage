@@ -9,6 +9,9 @@
 # otherwise will just kill the database
 #
 
+# do this all fromt the setup directory
+#cd $(dirname $0)
+
 ## Backup current db, as long as we dont see a -K
 if [[ ! "$@"  =~ "-K" ]] ; then
  [ ! -d olddb ] &&  mkdir olddb
