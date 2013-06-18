@@ -1,6 +1,7 @@
 package vone;
 use Dancer ':syntax';
 use Dancer::Plugin::Mongo;
+use Data::Dumper;
 
 our $VERSION = '0.1';
 
@@ -13,7 +14,7 @@ get '/index' => sub {
 };
 
 get '/' => sub {
-    template 'explore';
+    redirect('/explore');
 };
 
 get '/image/:hash' => sub {
@@ -33,12 +34,12 @@ post '/image/:hash' => sub {
     # update pic
 
     for my $p (qw/Latitude Longitude Tags Event/) {
+        my $value = params->{$p};
 	if($p eq "Tags") { 
-	    my @tags = split(',',$p); # if($p=~/Tags/);
-	    #debug('updating Tags: '.join(',',@tags));
-	    $Pics->update({Hash => $hash},{'$set'=>{Tags=>\@tags}    });
+	    my @tags = split(',',$value); # if($p=~/Tags/);
+	    $Pics->find_and_modify({query=>{Hash => $hash},update=>{'$set'=>{Tags=>\@tags}    }});
 	}else {
-	    $Pics->update({Hash => $hash},{'$set'=>{$p=>params->{$p}}});
+	    $Pics->find_and_modify({query=>{Hash => $hash},update=>{'$set'=>{$p=>$value}}});
 	}
 	
     }
