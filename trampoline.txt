@@ -4,6 +4,8 @@
 * peps connected implcitely through events
 
 * tag everything
+  - spell-check and auto complete tags
+  - establish aliases?
 
 * weight images
 

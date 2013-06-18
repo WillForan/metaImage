@@ -1,0 +1,28 @@
+* WEB
+** upload
+ - present previous without geo or time, incomplete tagging 
+ - drag and drop support
+ - auto parsing (exif)
+
+** edit
+  - multiselect
+  - map
+  - jquery
+      - hash tagging
+      - picture annotating (face tagging)
+
+** add people 
+  - shadow profile?
+
+** display
+  - time divs
+  - map location
+
+** login
+  - open id, facebook, twitter, g+
+  - session management
+
+
+* APP
+** upload
+** display
