@@ -1,0 +1,48 @@
+test images are originized in directorys as events 
+this structure can be parsed by imagesToJson.bash (which depends on exiftool)
+
+the json output can then be put in ../db/initial_db.js which will effect the database created by ../db/reset.bash 
+
+e.g. 
+
+  OilCityEaster/
+    0331131121.jpg
+    0331131153b.jpg
+    0331131249.jpg
+
+TO 
+[N.B.: in initial_db.js, these documents also include "Peps" and "Tags" fields]
+
+   { 
+          Hash: "f140cd8ac21494b0b36d0f2662a0e6f2",
+          Event: "OilCityEaster",
+          Height: 960,
+          Width: 1280,
+          Longitude: 79.688467,
+          Time: 112151,
+          File: "OilCityEaster/0331131121.jpg",
+          Date: "2013-03-31T11:21:51",
+          Latitude: 41.441811
+   },
+   { 
+          Time: 115344,
+          Latitude: 41.429978,
+          Width: 1280,
+          Longitude: 79.658433,
+          Date: "2013-03-31T11:53:44",
+          Hash: "cde50ef920f4b5bcb6e2b35e1a00d5b7",
+          Event: "OilCityEaster",
+          File: "OilCityEaster/0331131153b.jpg",
+          Height: 960
+   },
+   { 
+          Event: "OilCityEaster",
+          Latitude: 41.430886,
+          File: "OilCityEaster/0331131249.jpg",
+          Date: "2013-03-31T12:49:09",
+          Time: 124909,
+          Height: 960,
+          Width: 1280,
+          Hash: "f4e0a0cd587999c0a5504b618a9c4c5f",
+          Longitude: 79.661686
+   },

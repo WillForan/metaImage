@@ -10,6 +10,12 @@ Bring life to image metadata
 2. setup/db/reset.bash to start new database
   - setup/images/imagesToJson.bash  generates part of this (setup/db/readme)
 
+### Views
+have 
+   vone/views/explore.tt
+   vone/views/edit.tt
+currently avaiable 
+
 
 ##  Notes
 ### Editing
