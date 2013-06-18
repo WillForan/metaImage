@@ -1,16 +1,17 @@
-### DATABASE TESTING 
+# DATABASE TESTING 
 ## reset.bash
 
 will make a back up in olddb/ and reset either by
  1. using the restoredb folder
  2. running initial_db.js 
+    - manually curated from output of setup/images/imagesToJson.bash
 
 
-## initial_db.js
+# initial_db.js
 
 is the toy db creator for initial testing
 
-## restoredb
+# restoredb
 
 should be a folder containing good dump of the database
 likely a link from olddb/....
