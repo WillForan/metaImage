@@ -5,18 +5,47 @@
 	<form method="POST" action="./<%pic.Hash%>">
           <h1>Edit</h1>
 	  <div style="display:inline-block">
-	  <img  src="/images/testpics/<% pic.File %>" class="block" \> <br>
+	  <img  id="photo" src="/images/testpics/<% pic.File %>" class="block" \> <br>
 	  </div>
 	  <div style="display:inline-block">
-	  <input type="input" name="Event" value="<%pic.Event%>"         /><br />
-	  <input type="input" name="Latitude" value="<%pic.Latitude%>"  /><br />
-	  <input type="input" name="Longitude" value="<%pic.Longitude%>"/><br />
-	  <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/><br />
+	  Tags: <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/><br />
+	  Peps: <input type="input" name="Peps" value="<%pic.Peps.Name.join(',')%>"/><br />
+	  Peps: <input type="input" name="PepLoc" value="<%pic.Peps.Loc.join(',')%>"/><br />
+	  Event: <input type="input" name="Event" value="<%pic.Event%>"         /><br />
+	  Pos: <input type="input" name="Longitude" value="<%pic.Longitude%>"><input type="input" name="Latitude" value="<%pic.Latitude%>"  /><br />
 	  <input type="submit" name="submit" value="submit"         /><br />
 	  </div>
         </div>
+	<div id="map" style="height:250px"></div>
 	</form>
 	<% END %>
 
       </div>
 </div>
+
+
+<script src="/javascripts/OpenLayers.js"></script>
+<script>
+/* MAP */
+//http://gis.stackexchange.com/questions/39055/how-to-get-the-lat-long-of-a-clicked-location-using-leaflet-api
+//http://wiki.openstreetmap.org/wiki/OpenLayers_Simple_Example
+map = new OpenLayers.Map("map");
+map.addLayer(new OpenLayers.Layer.OSM());
+map.zoomToMaxExtent();
+toProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+map.events.register("click", map, function(e) {
+	var position = map.getLonLatFromPixel(e.xy).transform(map.getProjectionObject(), toProjection);
+	$('input[name=Latitude]').val(position.lat );
+	$('input[name=Longitude]').val(position.lon );
+	});
+
+/* Image TAG */
+$('#photo').click(function(e){
+  var image=$('#photo').position();
+  var x=e.pageX - image.left;
+  var y=e.pageY - image.top;
+  var input=$('input[name=PepLoc]');
+  input.val(input.val() + ' ' +  x +', '+ y)
+});
+</script>
+

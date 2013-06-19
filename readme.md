@@ -41,6 +41,9 @@ created with
 http://davidwalsh.name/demo/photo-stack.php
 
 ## js 
+### file upload
+http://blueimp.github.io/jQuery-File-Upload/
+
 ### face detection
 http://facedetection.jaysalvat.com/#
 https://github.com/jaysalvat/jquery.facedetection

@@ -44,6 +44,7 @@ jsonout=pics_$(date +%F).json
  $a{File}.=$value if $key =~ /file name/i; 
  END{
   $a{Event}=$ENV{p};
+  $a{Owner}="Will";
   $a{Hash}=$ENV{md5};
   print " { ";
   print "\t", join(",\n\t", map {$q=(/Lat|Long|Height|Width|Time/g)?"":"\""; "$_: $q$a{$_}$q"} (keys %a) ) ;
