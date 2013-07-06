@@ -32,7 +32,8 @@
   <a class="removeparent" href="#" style="float:right"> dont tag </a>
   <form action="/add/person" method="post">
    <input type=text name=Name  /> 
-   <div class="addperson" style="display:hidden"> <input type=text name=Email value="email@address" /> <input type=submit value="add and tag"> </div>
+   <div class="addperson" style="display:hidden"> <input type=text name=Email value="email@address" /> <input type=submit value="add and tag">
+   <input type=hidden name=x /><input type=hidden name=y /></div>
    </form>
  </div>
 </div>
@@ -70,71 +71,82 @@ map.events.register("click", map, function(e) {
 	});
 */
 /* Image TAG */
-function addThumb(x,y,name,email){
-   var $inputbox=find('.addperson').find('input[name=Name]')
+// grab tagperson hidden stuff (div form and hider)
+var $inputdiv=$('#tagperson')
+$inputdiv.find('.addperson').hide()
+var $inputbox= $inputdiv.find('input[name=Name]')
+
+function addThumb($form){
+   name=$form.find('input[name=Name]').val()
+   email=$form.find('input[name=Email]').val()
+   x=$form.find('input[name=x]').val()
+   y=$form.find('input[name=y]').val()
+
    $('#thumbnails-example').clone().css({
                 "background-position": x+"% "+y+"%",
                 display: 'inline-block'}
        	  ).appendTo('#thumbnails');
    console.log($(this))
    //$(this).parent().parent().hide()
-   $('div#tagperson').hide()
+   $('div#tagperson').hide().find('.addperson').hide()
    $inputbox.autocomplete("enable")
 }
+
+// submit new user with ajax if needed
+$inputdiv.find('form').ajaxForm({ 
+   success: function(response,status,xhr,$form){
+    console.log('success',status,response,xhr)
+    if(response.success==1){
+      addThumb($form)
+    } else {
+      alert(response.response)
+    }
+   },
+   error: function(e){ alert('database errore!'); console.log(e) }
+ 
+ });
+ 
+// pull names as labels, email as actual value -- ajax from /people
+$inputbox.autocomplete( {
+ // sever is:
+ source: "/people",
+ // sever says:
+ response: function(event,ui) {
+    typed=$(this).val()
+    // only offer to add if they aren't the same
+    if( $.grep(ui.content,function(e){return e.label == typed}).length < 1 ) {
+      ui.content.push( {label:'Add ' + typed, value: 'Add'} )
+    }
+  },
+ //user says:
+ select: function(event,ui){
+   if(ui.item.value=='Add'){
+     $(this).autocomplete("disable");
+     $inputdiv.find('.addperson').show();
+     return false;
+   } else {
+    addThumb($(this).parent('form'))
+  }
+ }
+});
+
 
 $('#photo').click(function(e){
   var image=$('#photo');
   var imageP=image.position();
+  // get the percent of whole of the face location
   var x=Math.round( (e.pageX - imageP.left)/image.innerWidth()*100);
   var y=Math.round( (e.pageY - imageP.top) /image.innerHeight()*100);
-  // offset by half the size of the circle image
-  var $inputdiv=$('#tagperson').css({left: e.pageX-18, top: e.pageY-24, display: 'block'}).show();
-  $inputdiv.find('.addperson').hide()
-  var $inputbox= $inputdiv.find('input[name=Name]')
-  $inputdiv.find('form').ajaxForm({ 
-     success: function(response,status,xhr,$form){
-      console.log('success',status,response,xhr)
-      if(response.success==1){
-       // ick, copy pasted lazyness
-       $('#thumbnails-example').clone().css({
-                    "background-position": x+"% "+y+"%",
-                    display: 'inline-block'}
-           	  ).appendTo('#thumbnails');
-       console.log($(this))
-       //$(this).parent().parent().hide()
-       $('div#tagperson').hide()
-       $inputbox.autocomplete("enable")
-      } else {
-        alert(response.response)
-      }
-     },
-     error: function(e){ alert(response.response) }
-   
-   });
 
-  $inputbox.autocomplete( {
-   response: function(event,ui) {
-      typed=$(this).val()
-      // only offer to add if they aren't the same
-      if( $.grep(ui.content,function(e){return e.label == typed}).length < 1 ) {
-        ui.content.push( {label:'Add ' + typed, value: 'Add'} )
-      }
-    },
-   select: function(event,ui){
-     if(ui.item.value=='Add'){
-       $(this).autocomplete("disable");
-       $inputdiv.find('.addperson').show();
-       return false;
-     } else {
-       $('#thumbnails-example').clone().css({
-                   "background-position": x+"% "+y+"%",
-                   display: 'inline-block'}
-          	  ).appendTo('#thumbnails');
-       $(this).parent().parent().parent().hide()
-    }
-  }});
+  // offset by half the size of face overlay image (36x48)
+  // and display it
+  // the display has controls to remove itself when ready
+  $inputdiv.css({left: e.pageX-18, top: e.pageY-24, display: 'block'}).show();
+  // change the x and y values
+  $inputdiv.find('input[name=x]').val(x);
+  $inputdiv.find('input[name=y]').val(y);
 
-  $inputbox.autocomplete("option","source", "/people" );
+
   // attach live event to this
   /*
   var name=prompt('who is this?')
