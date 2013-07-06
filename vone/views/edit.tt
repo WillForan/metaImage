@@ -4,15 +4,18 @@
         <div>
 	<form method="POST" action="./<%pic.md5sum%>">
           <h1>Edit</h1>
+
 	  <div style="display:inline-block">
-	  <img  id="photo" src="/images/byhash/<% pic.md5sum %>.jpg" class="block" \> <br>
+	   <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/><br />
+	   <img  id="photo" src="/images/byhash/<% pic.md5sum %>.jpg" class="block" \> <br>
+	   <div id="thumbnails">
+           <div id="thumbnails-example" style="height:48px;width:36px;background-image:url('/images/byhash/<% pic.md5sum %>.jpg'); background-position: 0% 0%; background-size:300px auto; display:none"> </div>
+	   </div>
 	  </div>
+
 	  <div style="display:inline-block">
-	  Tags: <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/><br />
-	  Peps: <input type="input" name="Peps" value="<%pic.Peps.Name.join(',')%>"/><br />
-	  Peps: <input type="input" name="PepLoc" value="<%pic.Peps.Loc.join(',')%>"/><br />
-	  Event: <input type="input" name="Event" value="<%pic.Event%>"         /><br />
-	  Pos: <input type="input" name="Longitude" value="<%pic.Long%>"><input type="input" name="Latitude" value="<%pic.Lat%>"  /><br />
+	  Peps: <input type="input" name="Peps" value=""/><br />
+	  Pos: <input type="input" name="Longitude" value="<%pic.Longitude%>"><input type="input" name="Latitude" value="<%pic.Latitude%>"  /><br />
 	  <input type="submit" name="submit" value="submit"         /><br />
 	  </div>
         </div>
@@ -23,6 +26,16 @@
       </div>
 </div>
 
+<div id="tagperson" style="padding: 0; position: absolute; display:none;">
+ <div><img src="/images/circle.sm.png" / > </div>
+ <div class="popup" style="background:white;">
+  <a class="removeparent" href="#" style="float:right"> dont tag </a>
+  <form action="/add/person" method="post">
+   <input type=text name=Name  /> 
+   <div class="addperson" style="display:hidden"> <input type=text name=Email value="email@address" /> <input type=submit value="add and tag"> </div>
+   </form>
+ </div>
+</div>
 
 <script src="/javascripts/OpenLayers.js"></script>
 <script src="/javascripts/tag-input/jquery.tagsinput.js"></script>
@@ -30,26 +43,110 @@
 /* MAP */
 //http://gis.stackexchange.com/questions/39055/how-to-get-the-lat-long-of-a-clicked-location-using-leaflet-api
 //http://wiki.openstreetmap.org/wiki/OpenLayers_Simple_Example
+/*
 map = new OpenLayers.Map("map");
 map.addLayer(new OpenLayers.Layer.OSM());
-map.zoomToMaxExtent();
-toProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+GPSproj = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+DISPproj = map.getProjectionObject();
+
+long=$('input[name=Longitude]').val();
+lat= $('input[name=Latitude]').val();
+if(isNaN(lat*long)) {
+  map.zoomToMaxExtent();
+}else{
+  center=new OpenLayers.LonLat(long,lat).transform( GPSproj, DISPproj); //from gps to display
+  map.setCenter(center, 15 );
+  
+  var markers = new OpenLayers.Layer.Markers( "Markers" );
+  map.addLayer(markers);
+  markers.addMarker(new OpenLayers.Marker(center));
+}
+
+
 map.events.register("click", map, function(e) {
-	var position = map.getLonLatFromPixel(e.xy).transform(map.getProjectionObject(), toProjection);
+	var position = map.getLonLatFromPixel(e.xy).transform(DISPproj, GPSproj);
 	$('input[name=Latitude]').val(position.lat );
 	$('input[name=Longitude]').val(position.lon );
 	});
-
+*/
 /* Image TAG */
+function addThumb(x,y,name,email){
+   var $inputbox=find('.addperson').find('input[name=Name]')
+   $('#thumbnails-example').clone().css({
+                "background-position": x+"% "+y+"%",
+                display: 'inline-block'}
+       	  ).appendTo('#thumbnails');
+   console.log($(this))
+   //$(this).parent().parent().hide()
+   $('div#tagperson').hide()
+   $inputbox.autocomplete("enable")
+}
+
 $('#photo').click(function(e){
   var image=$('#photo');
   var imageP=image.position();
   var x=Math.round( (e.pageX - imageP.left)/image.innerWidth()*100);
   var y=Math.round( (e.pageY - imageP.top) /image.innerHeight()*100);
+  // offset by half the size of the circle image
+  var $inputdiv=$('#tagperson').css({left: e.pageX-18, top: e.pageY-24, display: 'block'}).show();
+  $inputdiv.find('.addperson').hide()
+  var $inputbox= $inputdiv.find('input[name=Name]')
+  $inputdiv.find('form').ajaxForm({ 
+     success: function(response,status,xhr,$form){
+      console.log('success',status,response,xhr)
+      if(response.success==1){
+       // ick, copy pasted lazyness
+       $('#thumbnails-example').clone().css({
+                    "background-position": x+"% "+y+"%",
+                    display: 'inline-block'}
+           	  ).appendTo('#thumbnails');
+       console.log($(this))
+       //$(this).parent().parent().hide()
+       $('div#tagperson').hide()
+       $inputbox.autocomplete("enable")
+      } else {
+        alert(response.response)
+      }
+     },
+     error: function(e){ alert(response.response) }
+   
+   });
+
+  $inputbox.autocomplete( {
+   response: function(event,ui) {
+      typed=$(this).val()
+      // only offer to add if they aren't the same
+      if( $.grep(ui.content,function(e){return e.label == typed}).length < 1 ) {
+        ui.content.push( {label:'Add ' + typed, value: 'Add'} )
+      }
+    },
+   select: function(event,ui){
+     if(ui.item.value=='Add'){
+       $(this).autocomplete("disable");
+       $inputdiv.find('.addperson').show();
+       return false;
+     } else {
+       $('#thumbnails-example').clone().css({
+                   "background-position": x+"% "+y+"%",
+                   display: 'inline-block'}
+          	  ).appendTo('#thumbnails');
+       $(this).parent().parent().parent().hide()
+    }
+  }});
+
+  $inputbox.autocomplete("option","source", "/people" );
+  // attach live event to this
+  /*
   var name=prompt('who is this?')
   var input=$('input[name=PepLoc]');
   input.val(input.val() + (input.val()?',':'') + ' {name: '+name+',x:' +  x +',y: '+ y +'}')
+  */
 });
+
+
+/* ADD USER */
+// allow text boxes to be destroyed
+$(document).on('click','a.removeparent', function(et){ $(this).parent().parent().hide(); return false});
 
 /* Tags */
 $('input[name=Tags]').tagsInput(

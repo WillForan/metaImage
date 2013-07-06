@@ -194,3 +194,8 @@ img.block {
 }
 img.block-height {}
 img.block-width {}
+
+
+/* edit stuffs */
+
+a.removeparent { color: white; background: black; text-decoration: none; position:relative; top:0; left:48;}

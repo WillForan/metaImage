@@ -30,6 +30,7 @@ for my $f (glob('wedding/*jpg')) {
 
    print "\n\n$f\n";
    
+   print(Dumper(getPicInfo($f)));
    #my $moment = getMoment(\%picInfo,$eventCollection );
    print addPic($f,'byhash/', $picCollection ),"\n";
  

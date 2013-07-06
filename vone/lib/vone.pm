@@ -82,15 +82,28 @@ get '/logout' => sub {
 
 ######### Peps managemnt
 
-put '/add/:name' => sub {
-    my $name    = param('name');
-    my $showdow = params->{'shadow'} || 1;
-    my $email   = params->{'email'};
+ajax '/add/person' => sub {
+   return {response=>"you've given me a bad query",success=>0} unless param('Email') and param('Name');
+   my $exists =  mongo->get_database('stv1')->get_collection('Peps')->find_one({Email=> param('Email') });
+   return {response=>param('Email') . " is already accounted for",success=>0} if $exists;
+
+   my %pep;
+   for my $key (qw/Name Email YOB Tags/){
+       next unless param($key); 
+       # do better checking here!
+       $pep{$key}=param($key);	
+   }
+
+   #insert
+   my $inserted =  mongo->get_database('stv1')->get_collection('Peps')->insert(\%pep);
+   return {response=>"database error: insert failure",success=>0} unless $inserted;
+   return {response=>"success",success=>1};
 
 };
 
 
 ######### Image managemnt
+### TODO: dry code
 ### Uploading
 get '/upload' => sub {
     
@@ -115,7 +128,12 @@ post '/upload' => sub {
  }
 
  #return "@returnhash";
- redirect('/upload');
+ my $picCol   = mongo->get_database('stv1')->get_collection('Pics');
+ my @unfinished = $picCol->find({Email=> session->{Email},Longitude=> undef })->all();
+ my @uploaded  = $picCol->find({md5sum => {'$in' => \@returnhash} })->all();
+
+
+ template 'upload', {pics=>\@unfinished, newuploads=>\@uploaded};
 
 };
 
@@ -139,8 +157,15 @@ ajax  '/tags' => sub{
 };
 
 ajax  '/people' => sub{
- my @peps= map {param('term').$_} qw(foo bar blas);
- return \@peps;
+ my $term=param('term');
+ #my @peps= mongo->get_database('stv1')->get_collection('Peps')->find({'Name' => qr/$term/i })->all();
+ #@peps=map {$_->{'Name'} } @peps;
+ #debug(Dumper(@peps));
+ my @peps=grep {$_->{'label'} =~ /$term/i} ( 
+      {label=>'Will', value=>'willforan@gmail.com'},
+      {label=>'Emily',value=>'emilymente@gmail.com'},
+      {label=>'Alex' ,value=>'alexep@bad.c'} );
+ return \@peps ;
 };
 
 

@@ -71,16 +71,18 @@ sub getPicInfo{
      while( $value =~ m/(\d+) deg (\d+). ([0-9.]+)" (N|W|S|E)/ig ){ 
          my $decCord= $1+$2/60+$3/3600;
          my $dir = $4;
-         $decCord*=-1 if $decCord =~ /S|E/; # -- TODO: check actual coordinates
+	 #print "$decCord -> ";
+         $decCord*=-1 if $dir =~ /S|W/; 
          $decCord=sprintf("%.6f",$decCord);
+	 #print "$decCord\n";
   
-         $info{Lat}  = $decCord if $dir =~ /N|S/;
-         $info{Long} = $decCord if $dir =~ /E|W/;
+         $info{Latitude}  = $decCord if $dir =~ /N|S/;
+         $info{Longitude} = $decCord if $dir =~ /E|W/;
      }
     
     # THIS SHOULD BE IMPLEMENTED? TODO
     #if we have a lat/long but it's not ideal, use that instead
-    #for(qw/Lat Long/){
+    #for(qw/Latitude Longitude/){
     #$info{$_} = $value if(!exists($info{$_} && $tag =~ /$_/i )
     #}
   

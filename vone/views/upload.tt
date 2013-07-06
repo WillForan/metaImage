@@ -11,6 +11,20 @@
    <br><br>
 	<div id="map" style="height:250px"></div>
 	 <div id="remaining">
+         <h1>Uploaded</h1>
+	<% FOREACH pic IN newuploads  %>
+	  <div style="display:inline-block" id="<%pic.md5sum%>.jpg">
+	  <form method="POST" action="/image/<%pic.md5sum%>.jpg">
+	  <img  id="photo" src="/images/byhash/<% pic.md5sum %>.jpg" class="block" \> <br>
+	  Tags: <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/><br />
+	  Event: <input type="input" name="Event" value="<%pic.Event%>"         /><br />
+	  Peps: <input type="input" name="Peps" value="<%pic.Peps.Name.join(',')%>"/><br />
+	  Peps: <input type="input" name="PepLoc" value="<%pic.Peps.Loc.join(',')%>"/><br />
+	  Pos: <input type="input" name="Longitude" value="<%pic.Longitude%>"><input type="input" name="Latitude" value="<%pic.Latitude%>"  /><br />
+	  <input type="submit" name="submit" value="submit"         /><br />
+	  </form>
+	  </div>
+	<% END %>
          <h1>Remaining</h1>
 	<% FOREACH pic IN pics %>
 	  <div style="display:inline-block" id="<%pic.md5sum%>.jpg">

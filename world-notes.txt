@@ -23,3 +23,13 @@
 * streamline explore page
   * organize by event (time and location)
   * people have favorite area's to watch
+
+* face recognition (eigan faces?)
+
+* auto upload phone apps
+
+# Notes #
+
+* Pics
+  * byhash not tracked, needs to be created
+  * reset: rm byhash/*; db.Pics.remove({})
