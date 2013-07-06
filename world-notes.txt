@@ -1,0 +1,25 @@
+# TODO #
+* add user/peps backend coding
+* add users via tagging
+* **upload**: multi-select adds class, only this class is effected by map click
+
+
+# Working #
+* <a href="/upload">/upload</a> works
+  * all images' lat and long change on map clip
+
+* <a href="/explore">/explore</a> is rudimentary 
+  * but images are clickable, editable: [/image/HASH](http://localhost:3000/image/f4e0a0cd587999c0a5504b618a9c4c5f)
+     * /tags?term=PARTIAL fills in tags, but does so with phony data, not the db 
+     * /people?term=PARTIAL fills in tags, but does so with phony data, not the db 
+
+
+# Long Game #
+
+*  sexy upload
+  * segmented loading 
+  * drag and drop
+
+* streamline explore page
+  * organize by event (time and location)
+  * people have favorite area's to watch

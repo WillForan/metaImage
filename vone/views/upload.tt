@@ -1,31 +1,37 @@
 <div id="page">
       <div id="content">
+      
+   <div id="upload">
+         <h1>Upload</h1>
+	  <form method="POST" action="/upload" enctype="multipart/form-data">
+      <input name="files" type="file" multiple>
+      <input value="send 'em" type="submit">
+     </form>
+   </div>
+   <br><br>
+	<div id="map" style="height:250px"></div>
+	 <div id="remaining">
+         <h1>Remaining</h1>
 	<% FOREACH pic IN pics %>
-        <div>
-	<form method="POST" action="./<%pic.md5sum%>">
-          <h1>Edit</h1>
-	  <div style="display:inline-block">
+	  <div style="display:inline-block" id="<%pic.md5sum%>.jpg">
+	  <form method="POST" action="/image/<%pic.md5sum%>.jpg">
 	  <img  id="photo" src="/images/byhash/<% pic.md5sum %>.jpg" class="block" \> <br>
-	  </div>
-	  <div style="display:inline-block">
 	  Tags: <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/><br />
+	  Event: <input type="input" name="Event" value="<%pic.Event%>"         /><br />
 	  Peps: <input type="input" name="Peps" value="<%pic.Peps.Name.join(',')%>"/><br />
 	  Peps: <input type="input" name="PepLoc" value="<%pic.Peps.Loc.join(',')%>"/><br />
-	  Event: <input type="input" name="Event" value="<%pic.Event%>"         /><br />
-	  Pos: <input type="input" name="Longitude" value="<%pic.Long%>"><input type="input" name="Latitude" value="<%pic.Lat%>"  /><br />
+	  Pos: <input type="input" name="Longitude" value="<%pic.Longitude%>"><input type="input" name="Latitude" value="<%pic.Latitude%>"  /><br />
 	  <input type="submit" name="submit" value="submit"         /><br />
+	  </form>
 	  </div>
-        </div>
-	<div id="map" style="height:250px"></div>
-	</form>
 	<% END %>
+	 </div >
 
       </div>
 </div>
 
 
 <script src="/javascripts/OpenLayers.js"></script>
-<script src="/javascripts/tag-input/jquery.tagsinput.js"></script>
 <script>
 /* MAP */
 //http://gis.stackexchange.com/questions/39055/how-to-get-the-lat-long-of-a-clicked-location-using-leaflet-api
@@ -42,18 +48,11 @@ map.events.register("click", map, function(e) {
 
 /* Image TAG */
 $('#photo').click(function(e){
-  var image=$('#photo');
-  var imageP=image.position();
-  var x=Math.round( (e.pageX - imageP.left)/image.innerWidth()*100);
-  var y=Math.round( (e.pageY - imageP.top) /image.innerHeight()*100);
-  var name=prompt('who is this?')
+  var image=$('#photo').position();
+  var x=e.pageX - image.left;
+  var y=e.pageY - image.top;
   var input=$('input[name=PepLoc]');
-  input.val(input.val() + (input.val()?',':'') + ' {name: '+name+',x:' +  x +',y: '+ y +'}')
+  input.val(input.val() + ' ' +  x +', '+ y)
 });
-
-/* Tags */
-$('input[name=Tags]').tagsInput(
- {autocomplete_url:'/tags'}
-);
 </script>
 

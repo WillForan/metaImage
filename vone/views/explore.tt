@@ -20,7 +20,7 @@
 
         <div id=pictures>
          <% FOREACH p IN pics  %>
-            <a href="/image/<% p.Hash %>" > <img class=block src="images/testpics/<% p.File %>"></a>
+            <a href="/image/<% p.md5sum %>" > <img class=block src="images/byhash/<% p.md5sum %>.jpg"></a>
          <% END %>
         </div>
 

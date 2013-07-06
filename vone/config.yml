@@ -32,6 +32,7 @@ engines:
 # simple for debugging, switch to mongo later (TODO)
 session: Simple
 
+serializer: 'JSON'
 
 ##### DATABASE
 # usinging mongo

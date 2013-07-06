@@ -1,0 +1,47 @@
+<div id="page">
+      <div id="content">
+        <div>
+	<form method="POST" action="/login">
+          <h1>Sign Up/Log in</h1>
+	  <div style="display:inline-block">
+	  </div>
+	  <div style="display:inline-block">
+	  Email: <input type="input" name="Email" value="will.foran@gmail.com"/><br />
+	  Pass: <input type="password" name="Passwd" value=""/><br />
+	  Pos: <input type="input" name="Longitude" value=""><input type="input" name="Latitude" value=""  /><br />
+	  Birth Year: <input type="input" name="BYear" value=1986"\>
+	  <input type="submit" name="submit" value="submit"         /><br />
+	  </div>
+        </div>
+	<div id="map" style="height:250px"></div>
+	</form>
+
+      </div>
+</div>
+
+
+<script src="/javascripts/OpenLayers.js"></script>
+<script>
+/* MAP */
+//http://gis.stackexchange.com/questions/39055/how-to-get-the-lat-long-of-a-clicked-location-using-leaflet-api
+//http://wiki.openstreetmap.org/wiki/OpenLayers_Simple_Example
+map = new OpenLayers.Map("map");
+map.addLayer(new OpenLayers.Layer.OSM());
+map.zoomToMaxExtent();
+toProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+map.events.register("click", map, function(e) {
+	var position = map.getLonLatFromPixel(e.xy).transform(map.getProjectionObject(), toProjection);
+	$('input[name=Latitude]').val(position.lat );
+	$('input[name=Longitude]').val(position.lon );
+	});
+
+/* Image TAG */
+$('#photo').click(function(e){
+  var image=$('#photo').position();
+  var x=e.pageX - image.left;
+  var y=e.pageY - image.top;
+  var input=$('input[name=PepLoc]');
+  input.val(input.val() + ' ' +  x +', '+ y)
+});
+</script>
+

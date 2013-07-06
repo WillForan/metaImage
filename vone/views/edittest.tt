@@ -1,0 +1,29 @@
+<%USE Dumper %>
+<div id="page">
+      <div id="content">
+        <div>
+	<form method="POST" action="/test">
+	  <input type="input" name="Test[]" value="a"/><br />
+	  <input type="input" name="Test[]" value="a"/><br />
+	  <input type="input" name="Test[]" value="b"/><br />
+	  <input type="input" name="Test[]" value="b"         /><br />
+          <select name="tests" multiple>
+           <option value="1" >blah</option>
+           <option value="2">blah2</option>
+          </select>
+	  <input type="checkbox" name="testc[1][]" value="tc21"/><br />
+	  <input type="checkbox" name="testc[1][]" value="tc22"/><br />
+	  <input type="checkbox" name="testc[2][]" value="tc21"/><br />
+	  <input type="checkbox" name="testc[2][]" value="tc22"/><br />
+	  <input type="submit" name="submit" value="submit"         /><br />
+	  </div>
+        </div>
+	</form>
+        <div>
+          <% Dumper.dump_htm(Test) %>
+        </div>
+      </div>
+</div>
+
+
+
