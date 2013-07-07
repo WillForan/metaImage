@@ -123,7 +123,7 @@ post '/upload' => sub {
  my @returnhash;
  for my $file (@files) {
   push @returnhash, exifParse::addPic($file->tempname,
-                    'vone/public/images/byhash',
+                    'vone/public/images/byhash/orig',
                     mongo->get_database('stv1')->get_collection('Pics')
                    );
  }

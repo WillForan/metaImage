@@ -7,17 +7,17 @@
 
 	  <div style="display:inline-block">
 	   <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/>
-	   <img  id="photo" src="/images/byhash/<% pic.md5sum %>.jpg" class="block" \> <br>
+	   <img  id="photo" src="/images/byhash/thumbs/<% pic.md5sum %>.jpg" class="block" \> <br>
 	   <div id="thumbnails">
 	   <% FOREACH pep in pic.Peps %>
-           <div class='face-thumbnail' style="height:48px;width:36px;background-image:url('/images/byhash/<% pic.md5sum %>.jpg'); background-position: <%pep.x%>% <%pep.y%>%; background-size:300px auto;display:inline-block">
+           <div class='face-thumbnail' style="height:48px;width:36px;background-image:url('/images/byhash/thumbs/<% pic.md5sum %>.jpg'); background-position: <%pep.x%>% <%pep.y%>%; background-size:300px auto;display:inline-block">
 	     <input type=hidden name=Name value="< %pep.Name %>" \>
 	     <input type=hidden name=Email value="<% pep.Email %>" \>
 	     <input type=hidden name=x value="<% pep.x %>" \>
 	     <input type=hidden name=y value="<% pep.y %>" \>
 	   </div>
 	   <% END %>
-           <div  id="thumbnails-example" style="height:48px;width:36px;background-image:url('/images/byhash/<% pic.md5sum %>.jpg'); background-position: 0% 0%; background-size:300px auto; display:none"> </div>
+           <div  id="thumbnails-example" style="height:48px;width:36px;background-image:url('/images/byhash/thumbs/<% pic.md5sum %>.jpg'); background-position: 0% 0%; background-size:300px auto; display:none"> </div>
 	   </div>
 	  </div>
 

@@ -7,7 +7,9 @@ use warnings;
 use Data::Dumper;
 #use v5.14;
 use File::Copy;
+use File::Path qw(make_path);
 use Image::ExifTool qw(:Public);
+use Graphics::Magick;
 
 use vars qw($VERSION @ISA @EXPORT_OK );
 
@@ -20,8 +22,56 @@ $VERSION=0.1;
 # 
 # get meta info from pictures
 # setup events
+# add picture and thumbnail to server directory
 #
 #####
+
+# give array of input and outputs
+# resize
+# thumbs dir is hardcoded!!
+sub addFiles {
+     my $filename = shift;
+     my $uri      = shift;   
+     my $origdir  = shift;
+
+     my $thumbdir = "$origdir/../thumbs";
+     make_path($origdir) if(! -d $origdir);
+     make_path($thumbdir) if(! -d $thumbdir);
+
+    
+     copy($uri,"$origdir/$filename") or return 0;
+
+     # gm params?
+     ## see http://even.li/imagemagick-sharp-web-sized-photographs/
+     ##     for sharpening
+     # http://www.graphicsmagick.org/perl.html
+     #      for perl 
+     ### want to do
+     # gm convert -resize '300x' -auto-orient -normalize -unsharp 2x0.5+0.7+0 -quality 98 stotians.jpg stotians_small_sharp.jpg
+
+     # image is ugly, someting in command line is better?
+     #fork("gm convert -resize '300x' -auto-orient -normalize -unsharp 2x0.5+0.7+0 -quality 98 stotians.jpg stotians_small_sharp.jpg")
+     my $image = Graphics::Magick->new();
+     $image->set('quality',98);
+     warn "cannot read $origdir/$filename" unless $image->Read("$origdir/$filename"); 
+
+
+     # resize to a width of 300, scale hieght
+     my ($origw, $origh) = $image->Get('width','height');
+     $image->Resize(width=>300,height=>$origh*300/$origw);
+
+     # sharpen the blur of resize
+     $image->UnsharpMask(radius=> 2,sigma=> .5 ,amount=> .7 ,threshold=> 1);
+
+     # bring out the colors
+     $image->Normalize();
+
+     #write it out
+     warn "cannot write $thumbdir/$filename" unless $image->Write("$thumbdir/$filename");
+
+     return 1;
+
+}
 
 # setup the perl library
 
@@ -120,12 +170,9 @@ sub addPic{
     #check hash before copy
 
 
-    my $saveloc = "$savedir/$info{md5sum}.jpg";
-   # warn(qx(pwd).$saveloc."\n");
-    
     return 0 if( $collection->count({ md5sum=>$info{md5sum} }) > 0);
-    copy($uri,$saveloc) or return 0;
-    $collection->insert({%info});
+    return 0 unless addFiles("$info{md5sum}.jpg",$uri,$savedir );
+    return 0 unless $collection->insert({%info});
 
     return $info{md5sum};
 }
