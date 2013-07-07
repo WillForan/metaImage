@@ -2,6 +2,7 @@ package vone;
 use Dancer ':syntax';
 use Dancer::Plugin::Mongo;
 use Dancer::Plugin::Ajax;
+use JSON::XS;
 use Data::Dumper;
 use exifParse;
 
@@ -148,6 +149,27 @@ get '/image/:hash' => sub {
     template 'edit', {pics=>\@pics};
     # othwerwise go to image view
     #template 'view', {pics=>\@pics};
+};
+
+# json like [ {Name: 'Blah', Email: .., x: , y: }, ..]
+ajax '/image/:hash/Peps' => sub{
+ my $hash = param('hash');
+ # this shouldn't be an array
+ my $picCol   = mongo->get_database('stv1')->get_collection('Pics');
+ my $pic   = $picCol->find_one({md5sum => $hash});
+ return {success=>0,response=>'no image with that hash'} unless $pic;
+
+ my $json = request->body;
+ my $peps = decode_json $json;
+ debug($pic);
+ debug($hash);
+ debug($peps);
+
+ my $success = $picCol->find_and_modify({query=>{ md5sum => $hash}, update=>{'$set'=>{Peps => $peps  }} });
+
+ return {success=>0,response=>'db update failed'} unless $success;
+
+ return {success=>1,response=>'update'};
 };
 
 # edit single image

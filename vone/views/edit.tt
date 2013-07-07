@@ -6,20 +6,31 @@
           <h1>Edit</h1>
 
 	  <div style="display:inline-block">
-	   <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/><br />
+	   <input type="input" name="Tags" value="<%pic.Tags.join(',')%>"/>
 	   <img  id="photo" src="/images/byhash/<% pic.md5sum %>.jpg" class="block" \> <br>
 	   <div id="thumbnails">
-           <div id="thumbnails-example" style="height:48px;width:36px;background-image:url('/images/byhash/<% pic.md5sum %>.jpg'); background-position: 0% 0%; background-size:300px auto; display:none"> </div>
+	   <% FOREACH pep in pic.Peps %>
+           <div class='face-thumbnail' style="height:48px;width:36px;background-image:url('/images/byhash/<% pic.md5sum %>.jpg'); background-position: <%pep.x%>% <%pep.y%>%; background-size:300px auto;display:inline-block">
+	     <input type=hidden name=Name value="< %pep.Name %>" \>
+	     <input type=hidden name=Email value="<% pep.Email %>" \>
+	     <input type=hidden name=x value="<% pep.x %>" \>
+	     <input type=hidden name=y value="<% pep.y %>" \>
+	   </div>
+	   <% END %>
+           <div  id="thumbnails-example" style="height:48px;width:36px;background-image:url('/images/byhash/<% pic.md5sum %>.jpg'); background-position: 0% 0%; background-size:300px auto; display:none"> </div>
 	   </div>
 	  </div>
 
 	  <div style="display:inline-block">
-	  Peps: <input type="input" name="Peps" value=""/><br />
-	  Pos: <input type="input" name="Longitude" value="<%pic.Longitude%>"><input type="input" name="Latitude" value="<%pic.Latitude%>"  /><br />
-	  <input type="submit" name="submit" value="submit"         /><br />
-	  </div>
         </div>
-	<div id="map" style="height:250px"></div>
+	<div style="display:inline-block">
+	   <div id="map" style="height:250px;width:400px;"></div>
+	     <br>
+	     Pos: <input type="input" name="Longitude" value="<%pic.Longitude%>"><input type="input" name="Latitude" value="<%pic.Latitude%>"  /><br />
+	     <br>
+	     <input type="submit" name="submit" value="submit"         /><br />
+	   </div>
+	  </div>
 	</form>
 	<% END %>
 
@@ -44,7 +55,7 @@
 /* MAP */
 //http://gis.stackexchange.com/questions/39055/how-to-get-the-lat-long-of-a-clicked-location-using-leaflet-api
 //http://wiki.openstreetmap.org/wiki/OpenLayers_Simple_Example
-/*
+
 map = new OpenLayers.Map("map");
 map.addLayer(new OpenLayers.Layer.OSM());
 GPSproj = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
@@ -69,7 +80,7 @@ map.events.register("click", map, function(e) {
 	$('input[name=Latitude]').val(position.lat );
 	$('input[name=Longitude]').val(position.lon );
 	});
-*/
+
 /* Image TAG */
 // grab tagperson hidden stuff (div form and hider)
 var $inputdiv=$('#tagperson')
@@ -81,14 +92,28 @@ var $inputbox= $inputdiv.find('input[name=Name]')
 // if i'd know about .serialize(), this might look different
 function collectThumbs() {
  var pepTags = [];
- $('#thumbnails').children('div.thumbnail').each(function(i,e){
+ $('#thumbnails').children('div.face-thumbnail').each(function(i,e){
   var o={};
   $(e).find('input[type=hidden]').each(function(j,fld){ o[$(fld).attr('name')] = $(fld).val() })
   pepTags.push(o);
  })
 //TODO: send pepTags to perl
 //http://stackoverflow.com/questions/14042330/dancer-how-to-share-data-and-waiting-response-between-2-post-without-blocking
+console.log(pepTags)
+ $.ajax({
+  type: "POST",
+  contentType: 'application/json',
+  url: window.location.pathname + '/Peps',
+  data: JSON.stringify(pepTags),
+  dataType: 'json',
+  success: function(data,textstatus,jqXHR){
+    console.log(data,textstatus,jqXHR)
+  }
+ });
 }
+
+//click on thumbnails to remove them
+$(document).on('click','.face-thumbnail',function(e){$(this).remove();collectThumbs()  })
 
 function addThumb($form){
    name=$form.find('input[name=Name]').val()
@@ -96,9 +121,11 @@ function addThumb($form){
    x=$form.find('input[name=x]').val()
    y=$form.find('input[name=y]').val()
 
-   // craete a thumbnail
+   // craete a face thumbnail (only in the browser)
    // also add hidden inputs for easy parsting later
-   $('#thumbnails-example').clone().addClass('thumbnail').css({
+   // clicking on this removes the tagged from the image
+   // add class here b/c we dont want to include the clone base in later serializing
+   $('#thumbnails-example').addClass('face-thumbnail').clone().css({
                 "background-position": x+"% "+y+"%",
                 display: 'inline-block'}
        	  ).appendTo('#thumbnails').append(
@@ -110,6 +137,9 @@ function addThumb($form){
    $('div#tagperson').hide().find('.addperson').hide()
    // re-enable autocompleting user names.. just incase it was disabled
    $inputbox.autocomplete("enable")
+
+   // find all the face-thumbs and update the server
+   collectThumbs();
 }
 
 /* ADD USER */

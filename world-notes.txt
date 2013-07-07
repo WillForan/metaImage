@@ -1,25 +1,50 @@
-# TODO #
-* add user/peps backend coding
-* add users via tagging
-* **upload**: multi-select adds class, only this class is effected by map click
-* reduce size of presented images by creating scaled version on upload
-
-
 # Working #
 * <a href="/upload">/upload</a> works
   * all images' lat and long change on map clip
 
-* <a href="/add/people"> via post (see /image/HASH)
+* [/image/HASH](http://localhost:3000/image/f4e0a0cd587999c0a5504b618a9c4c5f) 
+  * add/remove tag words
+  * add/remove tag people in positions
+    * add shadow user via email (**TODO** maybe but these in user->InEvent )
+  * update geo position
+  * /tags?term=PARTIAL fills in tags, but does so with phony data, not the db 
+  * /people?term=PARTIAL fills in tags, but does so with phony data, not the db 
+  * ugly jquery code to tag people, present thumbnails using **300px width assumption**
+
+* **/add/people** via post (see /image/HASH)
   * still need distiniction between a global person and how a users knows someone personally (for listing)
+
+* **/img/HASH/Peps** via post with json like  <pre>[{Name:.., Email:.., x:.., y:..}, .. ] </pre>
+  * x and y are in percent of image to center (from top left)
 
 * <a href="/explore">/explore</a> is rudimentary 
   * but images are clickable, editable: [/image/HASH](http://localhost:3000/image/f4e0a0cd587999c0a5504b618a9c4c5f)
-     * /tags?term=PARTIAL fills in tags, but does so with phony data, not the db 
-     * /people?term=PARTIAL fills in tags, but does so with phony data, not the db 
-     * ugly jquery code to tag people, present thumbnails using **300px width assumption**
+
+# TODO #
+* reduce size of presented images by creating scaled version on upload
+* user creation page
+* add creator key for uploaded images
+   * requires login
+* fix css for word tags
+* fix people tagging: no valiation yet + always adding one empty tag??
+* fix tag search to actually call on the db
+* update db with word tags emmediately
+* script automatic db drop and add via curl (see code in edit.tt js for perl link)
+* add date/time to edit page
+* decide on person/image/friend model
+* add privacy setting to edit page
+
+* work on explore page
+* add event grouping
+
+* **upload**: multi-select adds class, only this class is effected by map click
+* <s>add users via tagging</s>
+
 
 
 # Long Game #
+
+* easy batch edit
 
 *  sexy upload
   * segmented loading 
@@ -41,3 +66,4 @@
 * Pics
   * byhash not tracked, needs to be created
   * reset: rm byhash/*; db.Pics.remove({})
+* for people tagging in pic edit: pushing enter is unrecoverable, tab doesn't work
