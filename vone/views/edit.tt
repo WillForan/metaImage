@@ -2,7 +2,7 @@
       <div id="content">
 	<% FOREACH pic IN pics %>
         <div>
-	<form method="POST" action="./<%pic.md5sum%>">
+	<form autocomplete="off" method="POST" action="./<%pic.md5sum%>">
           <h1>Edit</h1>
 
 	  <div style="display:inline-block">
@@ -30,11 +30,11 @@
  <div><img src="/images/circle.sm.png" / > </div>
  <div class="popup" style="background:white;">
   <a class="removeparent" href="#" style="float:right"> dont tag </a>
-  <form action="/add/person" method="post">
+  <form autocomplete="off" action="/add/person" method="post">
+   <input type=hidden name=x /><input type=hidden name=y />
    <input type=text name=Name  /> 
-   <div class="addperson" style="display:hidden"> <input type=text name=Email value="email@address" /> <input type=submit value="add and tag">
-   <input type=hidden name=x /><input type=hidden name=y /></div>
-   </form>
+   <div class="addperson" style="display:hidden"> <input type=text name=Email value="email@address" /> <input type=submit value="add and tag"></div>
+  </form>
  </div>
 </div>
 
@@ -76,26 +76,49 @@ var $inputdiv=$('#tagperson')
 $inputdiv.find('.addperson').hide()
 var $inputbox= $inputdiv.find('input[name=Name]')
 
+// create json object like [ {Name: .., Email: .., x: .., y: ...}, .. ]
+// do this by going through each thumb and building object from hidden fields
+// if i'd know about .serialize(), this might look different
+function collectThumbs() {
+ var pepTags = [];
+ $('#thumbnails').children('div.thumbnail').each(function(i,e){
+  var o={};
+  $(e).find('input[type=hidden]').each(function(j,fld){ o[$(fld).attr('name')] = $(fld).val() })
+  pepTags.push(o);
+ })
+//TODO: send pepTags to perl
+//http://stackoverflow.com/questions/14042330/dancer-how-to-share-data-and-waiting-response-between-2-post-without-blocking
+}
+
 function addThumb($form){
    name=$form.find('input[name=Name]').val()
    email=$form.find('input[name=Email]').val()
    x=$form.find('input[name=x]').val()
    y=$form.find('input[name=y]').val()
 
-   $('#thumbnails-example').clone().css({
+   // craete a thumbnail
+   // also add hidden inputs for easy parsting later
+   $('#thumbnails-example').clone().addClass('thumbnail').css({
                 "background-position": x+"% "+y+"%",
                 display: 'inline-block'}
-       	  ).appendTo('#thumbnails');
-   console.log($(this))
-   //$(this).parent().parent().hide()
+       	  ).appendTo('#thumbnails').append(
+	  '<input type=hidden name=Name value="'+name+
+	  '" /> <input type=hidden name=Email value="'+email+
+	  '" />').append($form.find('input[type=hidden]').clone() )
+
+   // hide the add person dialog part
    $('div#tagperson').hide().find('.addperson').hide()
+   // re-enable autocompleting user names.. just incase it was disabled
    $inputbox.autocomplete("enable")
 }
+
+/* ADD USER */
+// allow text boxes to be destroyed, should be abstraced more
+$(document).on('click','a.removeparent', function(et){ $(this).parent().parent().hide().find('.addperson').hide();$inputbox.autocomplete("enable") ; return false});
 
 // submit new user with ajax if needed
 $inputdiv.find('form').ajaxForm({ 
    success: function(response,status,xhr,$form){
-    console.log('success',status,response,xhr)
     if(response.success==1){
       addThumb($form)
     } else {
@@ -105,7 +128,7 @@ $inputdiv.find('form').ajaxForm({
    error: function(e){ alert('database errore!'); console.log(e) }
  
  });
- 
+/* TAG USER */ 
 // pull names as labels, email as actual value -- ajax from /people
 $inputbox.autocomplete( {
  // sever is:
@@ -120,15 +143,18 @@ $inputbox.autocomplete( {
   },
  //user says:
  select: function(event,ui){
+   // if they click add, launch the add user stuff and disable this
    if(ui.item.value=='Add'){
      $(this).autocomplete("disable");
      $inputdiv.find('.addperson').show();
      return false;
+   //otherwise precede to create the thumbnail based on the form we've created
    } else {
     addThumb($(this).parent('form'))
   }
  }
 });
+$inputbox.autocomplete("disable") // don't show at first
 
 
 $('#photo').click(function(e){
@@ -141,26 +167,19 @@ $('#photo').click(function(e){
   // offset by half the size of face overlay image (36x48)
   // and display it
   // the display has controls to remove itself when ready
-  $inputdiv.css({left: e.pageX-18, top: e.pageY-24, display: 'block'}).show();
-  // change the x and y values
   $inputdiv.find('input[name=x]').val(x);
   $inputdiv.find('input[name=y]').val(y);
+  $inputdiv.css({left: e.pageX-18, top: e.pageY-24, display: 'block'}).show();
+  $inputbox.autocomplete("enable")
+  // change the x and y values
 
-
-  // attach live event to this
-  /*
-  var name=prompt('who is this?')
-  var input=$('input[name=PepLoc]');
-  input.val(input.val() + (input.val()?',':'') + ' {name: '+name+',x:' +  x +',y: '+ y +'}')
-  */
 });
 
 
-/* ADD USER */
-// allow text boxes to be destroyed
-$(document).on('click','a.removeparent', function(et){ $(this).parent().parent().hide(); return false});
+   
 
 /* Tags */
+//TODO why is it styled so ugly?
 $('input[name=Tags]').tagsInput(
  {autocomplete_url:'/tags'}
 );

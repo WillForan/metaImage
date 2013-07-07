@@ -2,16 +2,21 @@
 * add user/peps backend coding
 * add users via tagging
 * **upload**: multi-select adds class, only this class is effected by map click
+* reduce size of presented images by creating scaled version on upload
 
 
 # Working #
 * <a href="/upload">/upload</a> works
   * all images' lat and long change on map clip
 
+* <a href="/add/people"> via post (see /image/HASH)
+  * still need distiniction between a global person and how a users knows someone personally (for listing)
+
 * <a href="/explore">/explore</a> is rudimentary 
   * but images are clickable, editable: [/image/HASH](http://localhost:3000/image/f4e0a0cd587999c0a5504b618a9c4c5f)
      * /tags?term=PARTIAL fills in tags, but does so with phony data, not the db 
      * /people?term=PARTIAL fills in tags, but does so with phony data, not the db 
+     * ugly jquery code to tag people, present thumbnails using **300px width assumption**
 
 
 # Long Game #
@@ -23,6 +28,9 @@
 * streamline explore page
   * organize by event (time and location)
   * people have favorite area's to watch
+
+* add drag to image tagging thumbnails to better position face
+* allow position tagging for things (not just people) 
 
 * face recognition (eigan faces?)
 
