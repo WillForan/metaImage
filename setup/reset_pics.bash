@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
+dbname=moment
 temp=$(mktemp XXXX.js)
 cat >$temp <<HEREDOC
 db.Pics.remove({})
 
 HEREDOC
 
-mongo localhost/stv1 $temp
+mongo localhost/moment $temp
 rm $temp
 rm -r images/byhash/*
 

@@ -1,3 +1,9 @@
+# Init/reset #
+  - mkdir vone/public/images/byhash
+  - setup/reset_pics.bash
+  - ./tmux.bash
+  - grep "TODO FINISH" -R *
+  
 # Working #
 * <a href="/upload">/upload</a> works
   * all images' lat and long change on map clip
@@ -21,7 +27,7 @@
   * but images are clickable, editable: [/image/HASH](http://localhost:3000/image/f4e0a0cd587999c0a5504b618a9c4c5f)
 
 # TODO #
-* reduce size of presented images by creating scaled version on upload
+* reduce size of presented images by <s>creating scaled version on upload</s>
 * user creation page
 * add creator key for uploaded images
    * requires login
@@ -62,7 +68,8 @@
 * auto upload phone apps
 
 # Notes #
-
+* Time: 6:30pm=>18.5
+* Date should be year. dayofyear/365 (366 if leapyear) 
 * Pics
   * byhash not tracked, needs to be created
   * reset: rm byhash/*; db.Pics.remove({})

@@ -7,6 +7,7 @@ use Data::Dumper;
 use exifParse;
 
 our $VERSION = '0.1';
+our $dbname='moment';
 
 get '/test' => sub {template 'edittest' };
 post '/test' => sub {
@@ -51,7 +52,7 @@ get '/login' => sub {
 };
 post '/login' => sub {
     ## TODO: openid
-    my $id   = mongo->get_database('stv1')->get_collection('Peps')->find_one({Email=> params->{Email}});
+    my $id   = mongo->get_database($dbname)->get_collection('Peps')->find_one({Email=> params->{Email}});
     
     redirect('/login?fail=uname') unless $id;
     # clearner way to do this?
@@ -85,7 +86,7 @@ get '/logout' => sub {
 
 ajax '/add/person' => sub {
    return {response=>"you've given me a bad query",success=>0} unless param('Email') and param('Name');
-   my $exists =  mongo->get_database('stv1')->get_collection('Peps')->find_one({Email=> param('Email') });
+   my $exists =  mongo->get_database($dbname)->get_collection('Peps')->find_one({Email=> param('Email') });
    return {response=>param('Email') . " is already accounted for",success=>0} if $exists;
 
    my %pep;
@@ -96,7 +97,7 @@ ajax '/add/person' => sub {
    }
 
    #insert
-   my $inserted =  mongo->get_database('stv1')->get_collection('Peps')->insert(\%pep);
+   my $inserted =  mongo->get_database($dbname)->get_collection('Peps')->insert(\%pep);
    return {response=>"database error: insert failure",success=>0} unless $inserted;
    return {response=>"success",success=>1};
 
@@ -108,7 +109,7 @@ ajax '/add/person' => sub {
 ### Uploading
 get '/upload' => sub {
     
-    my $picCol   = mongo->get_database('stv1')->get_collection('Pics');
+    my $picCol   = mongo->get_database($dbname)->get_collection('Pics');
     my @unfinished = $picCol->find({Email=> session->{Email},Longitude=> undef })->all();
 
     # if name is owner
@@ -124,12 +125,12 @@ post '/upload' => sub {
  for my $file (@files) {
   push @returnhash, exifParse::addPic($file->tempname,
                     'vone/public/images/byhash/orig',
-                    mongo->get_database('stv1')->get_collection('Pics')
+                    mongo->get_database($dbname)->get_collection('Pics')
                    );
  }
 
  #return "@returnhash";
- my $picCol   = mongo->get_database('stv1')->get_collection('Pics');
+ my $picCol   = mongo->get_database($dbname)->get_collection('Pics');
  my @unfinished = $picCol->find({Email=> session->{Email},Longitude=> undef })->all();
  my @uploaded  = $picCol->find({md5sum => {'$in' => \@returnhash} })->all();
 
@@ -143,7 +144,7 @@ post '/upload' => sub {
 # view single image
 get '/image/:hash' => sub {
     my $hash = param('hash');
-    my @pics   = mongo->get_database('stv1')->get_collection('Pics')->find({md5sum => "$hash"})->all();
+    my @pics   = mongo->get_database($dbname)->get_collection('Pics')->find({md5sum => "$hash"})->all();
 
     # if name is owner
     template 'edit', {pics=>\@pics};
@@ -155,7 +156,7 @@ get '/image/:hash' => sub {
 ajax '/image/:hash/Peps' => sub{
  my $hash = param('hash');
  # this shouldn't be an array
- my $picCol   = mongo->get_database('stv1')->get_collection('Pics');
+ my $picCol   = mongo->get_database($dbname)->get_collection('Pics');
  my $pic   = $picCol->find_one({md5sum => $hash});
  return {success=>0,response=>'no image with that hash'} unless $pic;
 
@@ -180,7 +181,7 @@ ajax  '/tags' => sub{
 
 ajax  '/people' => sub{
  my $term=param('term');
- #my @peps= mongo->get_database('stv1')->get_collection('Peps')->find({'Name' => qr/$term/i })->all();
+ #my @peps= mongo->get_database($dbname)->get_collection('Peps')->find({'Name' => qr/$term/i })->all();
  #@peps=map {$_->{'Name'} } @peps;
  #debug(Dumper(@peps));
  my @peps=grep {$_->{'label'} =~ /$term/i} ( 
@@ -195,7 +196,7 @@ post '/image/:hash' => sub {
     ## TODO: CHECK OWNER
 
     my $hash = param('hash');
-    my $Pics = mongo->get_database('stv1')->get_collection('Pics');
+    my $Pics = mongo->get_database($dbname)->get_collection('Pics');
     # this shouldn't be an array
     my @pics   = $Pics->find({md5sum => "$hash"})->all();
     # update pic
@@ -217,9 +218,9 @@ post '/image/:hash' => sub {
 };
 
 get '/explore' => sub {
-    my @peps   = mongo->get_database('stv1')->get_collection('Peps')->find()->all();
-    my @pics   = mongo->get_database('stv1')->get_collection('Pics')->find()->all();
-    my @events = mongo->get_database('stv1')->get_collection('Events')->find()->all();
+    my @peps   = mongo->get_database($dbname)->get_collection('Peps')->find()->all();
+    my @pics   = mongo->get_database($dbname)->get_collection('Pics')->find()->all();
+    my @events = mongo->get_database($dbname)->get_collection('Events')->find()->all();
 
     template 'explore', { location => 'Pittsburgh', name=> session->{Name}||'AC',
 	                  pics => \@pics, peps=>\@peps, events=>\@events };
@@ -232,7 +233,7 @@ get '/explore/:type/:value' => sub {
     my $value=param('value');
     redirect('/explore') unless $type =~ m/^(Tags|Name)$/;
 
-    my $db=mongo->get_database('stv1');
+    my $db=mongo->get_database($dbname);
     my @peps   = $db->get_collection('Peps')->find(  {$type => "$value"})->all();
     my @pics   = $db->get_collection('Pics')->find(  {$type => "$value"})->all();
     my @events = $db->get_collection('Events')->find({$type => "$value"})->all();

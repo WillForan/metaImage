@@ -9,7 +9,7 @@ use File::Copy;
 
 #use 'vone/lib/exifParse.pm'
 use lib '../../vone/lib/';
-use exifParse qw(addPic getPicInfo);
+use exifParse qw(addPic getPicInfo getMoment);
 
 ######
 # 
@@ -21,7 +21,7 @@ use exifParse qw(addPic getPicInfo);
 
 #TODO: setup db
 use MongoDB;
-my $db = MongoDB::MongoClient->new(host => 'localhost', port => 27017)->get_database( 'stv1' );
+my $db = MongoDB::MongoClient->new(host => 'localhost', port => 27017)->get_database( 'moment' );
 my $eventCollection = $db->get_collection( 'Events' ) or die 'cannot open db Events collection in stv1';
 my $picCollection = $db->get_collection( 'Pics' ) or die 'cannot open db Pics collection in stv1';
 
@@ -30,8 +30,9 @@ for my $f (glob('wedding/*jpg')) {
 
    print "\n\n$f\n";
    
-   print(Dumper(getPicInfo($f)));
-   #my $moment = getMoment(\%picInfo,$eventCollection );
+   my %picInfo=getPicInfo($f);
+#   print(Dumper(%picInfo));
+   my $moment = getMoment(\%picInfo,$picCollection );
    print addPic($f,'byhash/', $picCollection ),"\n";
  
 }
