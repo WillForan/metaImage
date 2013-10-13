@@ -54,6 +54,19 @@ map = new OpenLayers.Map("map");
 map.addLayer(new OpenLayers.Layer.OSM());
 map.zoomToMaxExtent();
 toProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+
+//add current location through html5 geolocation spec
+/* get position from browser
+ *transform from WGS 1984 to Spherical Mercator Projection
+ * center and zoom
+ */
+navigator.geolocation.getCurrentPosition(function(position) {       
+  var lonLat = new OpenLayers.LonLat(position.coords.longitude, position.coords.latitude)
+                             .transform( toProjection, map.getProjectionObject() );
+  map.setCenter(lonLat, 14);
+});
+
+// if we click somewhere, set the cords
 map.events.register("click", map, function(e) {
 	var position = map.getLonLatFromPixel(e.xy).transform(map.getProjectionObject(), toProjection);
 	$('input[name=Latitude]').val(position.lat );
